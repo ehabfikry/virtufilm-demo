@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VirtuFilm AI Studio — Interactive Web Demo (Windows & macOS)</title>
+  <meta name="description" content="Try VirtuFilm AI Studio live in your browser: Cast Sheet & Location Lock, @Mention Cinema Prompt Builder, and BYOK AI Video Cost Calculator.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body { background: radial-gradient(circle at 20% 0%, #1e1b4b 0%, #090d16 65%); color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+    .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.16); }
+    .gold-grad { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+  </style>
+</head>
+<body class="antialiased selection:bg-amber-500/30">
+
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-40 glass border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl gold-grad flex items-center justify-center text-slate-950 font-black shadow-lg">
+          <i class="fa-solid fa-clapperboard"></i>
+        </div>
+        <div>
+          <div class="font-black text-white text-sm tracking-wide flex items-center gap-2">
+            VIRTUFILM AI STUDIO
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold">INTERACTIVE DEMO</span>
+          </div>
+          <div class="text-[11px] text-slate-400">Windows &amp; macOS (Apple Silicon) • One-Time License • Zero Monthly Fees</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="https://ehabfiki.gumroad.com/l/ruozct/EARLY100" target="_blank" class="px-4 py-2 rounded-xl gold-grad hover:brightness-110 text-slate-950 font-black text-xs shadow-lg flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-bolt"></i> Get Full App ($19 — 61% OFF)
+        </a>
+        <a href="https://payhip.com/b/2wWFs" target="_blank" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs transition hidden sm:inline-flex items-center gap-1.5">
+          Payhip
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-6xl mx-auto px-4 pb-2.5 flex flex-wrap items-center gap-2 text-xs">
+      <button onclick="switchDemoTab('studio')" id="tab-btn-studio" class="px-3.5 py-1.5 rounded-xl gold-grad text-slate-950 font-black flex items-center gap-1.5 cursor-pointer">
+        <i class="fa-solid fa-masks-theater"></i> 1. Cast Sheet &amp; Prompt Studio
+      </button>
+      <button onclick="switchDemoTab('calc')" id="tab-btn-calc" class="px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-bold flex items-center gap-1.5 cursor-pointer">
+        <i class="fa-solid fa-calculator text-emerald-400"></i> 2. BYOK Cost Calculator
+      </button>
+      <button onclick="openUpgradeModal('Blender 3D Camera Blocking & Pre-vis')" class="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800 font-semibold flex items-center gap-1.5 cursor-pointer">
+        <i class="fa-solid fa-lock text-amber-400 text-[10px]"></i> 3D Pre-vis
+      </button>
+      <button onclick="openUpgradeModal('Actor LoRA Training & Local ComfyUI Bridge')" class="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800 font-semibold flex items-center gap-1.5 cursor-pointer">
+        <i class="fa-solid fa-lock text-amber-400 text-[10px]"></i> Actor LoRA &amp; ComfyUI
+      </button>
+      <button onclick="openUpgradeModal('4K SeedVR2 Upscale & 9:16 LTX-2.5 Reframe')" class="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-400 border border-slate-800 font-semibold flex items-center gap-1.5 cursor-pointer">
+        <i class="fa-solid fa-lock text-amber-400 text-[10px]"></i> 4K &amp; 9:16 Post-Production
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- TAB 1: CAST SHEET & PROMPT STUDIO -->
+    <section id="tab-studio" class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- Left: Cast Sheet & Style Lock -->
+      <div class="lg:col-span-5 glass rounded-2xl p-4 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+          <h2 class="text-sm font-black text-emerald-300 flex items-center gap-2">
+            <i class="fa-solid fa-masks-theater"></i> Cast Sheet &amp; Location Lock (v1.2)
+          </h2>
+          <span class="text-[10px] text-slate-400">Type <code class="text-emerald-300">@Handle</code> on the right</span>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[11px] font-bold text-amber-300 block">Master Style Look Line (Appended to Every Shot)</label>
+          <input id="demo-look-line" type="text" value="Kodak Vision3 500T 35mm anamorphic film grain, warm tungsten practicals, shallow depth of field f/2.0" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-amber-400 outline-none">
+        </div>
+
+        <div id="demo-members-list" class="space-y-2"></div>
+
+        <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-2">
+          <div class="text-[11px] font-bold text-slate-300">+ Add Your Own Character or Location</div>
+          <div class="grid grid-cols-2 gap-2">
+            <input id="new-handle" type="text" placeholder="Handle (e.g. Alex)" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none">
+            <select id="new-kind" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none">
+              <option value="character">Character</option>
+              <option value="location">Location / Room</option>
+            </select>
+          </div>
+          <input id="new-desc" type="text" placeholder="Fixed description (age, hair, outfit, or room decor)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none">
+          <button onclick="addDemoMember()" class="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer">
+            <i class="fa-solid fa-plus"></i> Lock into Cast Sheet
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Cindy Prompt & Storyboard Generator -->
+      <div class="lg:col-span-7 glass rounded-2xl p-4 space-y-4 relative">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+          <h2 class="text-sm font-black text-amber-300 flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Cindy AI Director — Scene &amp; Storyboard Builder
+          </h2>
+          <select id="demo-lens" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-amber-300 font-bold outline-none">
+            <option value="35mm anamorphic prime">35mm Anamorphic</option>
+            <option value="50mm prime lens">50mm Natural Eye</option>
+            <option value="85mm f/1.8 portrait lens">85mm f/1.8 Close-Up</option>
+            <option value="24mm wide establishing lens">24mm Wide Master</option>
+          </select>
+        </div>
+
+        <div class="space-y-2 relative">
+          <label class="text-[11px] font-bold text-slate-300 block">Describe your scene (type <code class="text-emerald-300">@</code> to insert locked characters or locations):</label>
+          <textarea id="demo-scene-input" rows="3" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl p-3 text-xs text-white outline-none">@Maya enters @LondonCafe, pauses near the doorway, spots her friend, and shares a warm nervous smile.</textarea>
+          <div id="demo-mention-popup" class="hidden absolute left-2 top-full mt-1 z-30 bg-slate-900 border border-emerald-500/50 rounded-xl shadow-2xl p-1.5 min-w-[230px]"></div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="generateDemoOutput()" class="px-5 py-2.5 rounded-xl gold-grad hover:brightness-110 text-slate-950 font-black text-xs shadow-lg flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-clapperboard"></i> Generate Master Prompt &amp; 3-Shot Storyboard
+          </button>
+          <button onclick="openUpgradeModal('Direct Voice Direction + 1-Click Kling / LTX / ComfyUI Render')" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-microphone text-amber-400"></i> Voice Direct (Full App 🔒)
+          </button>
+        </div>
+
+        <!-- Output Area -->
+        <div id="demo-output" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- TAB 2: BYOK COST CALCULATOR -->
+    <section id="tab-calc" class="hidden glass rounded-2xl p-6 space-y-5">
+      <div class="border-b border-slate-800 pb-3">
+        <h2 class="text-base font-black text-emerald-300 flex items-center gap-2">
+          <i class="fa-solid fa-calculator"></i> BYOK AI Video Cost Calculator vs. Monthly Subscriptions
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">See how much you save by paying raw API rates (or $0 locally on ComfyUI) with VirtuFilm AI Studio.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs font-bold text-slate-300 block mb-1.5">AI Video Model (5-Second Shot)</label>
+            <select id="calc-model" onchange="updateCalc()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-bold outline-none">
+              <option value="0.00">Local ComfyUI (Wan 2.2 / LTX) — $0.00 / shot</option>
+              <option value="0.04" selected>Alibaba Wan 2.2 (BYOK Cloud) — $0.04 / shot</option>
+              <option value="0.08">Lightricks LTX-2.5 (BYOK Cloud) — $0.08 / shot</option>
+              <option value="0.25">MiniMax Hailuo H3 (BYOK Cloud) — $0.25 / shot</option>
+              <option value="0.77">Kling 4.0 Pro Omni (BYOK Cloud) — $0.77 / shot</option>
+              <option value="1.20">ByteDance Seedance 2.5 (BYOK Cloud) — $1.20 / shot</option>
+            </select>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">Number of 5-Second Shots</span>
+              <span id="calc-shots-val" class="text-amber-300">20 shots</span>
+            </div>
+            <input id="calc-shots" type="range" min="5" max="100" value="20" oninput="updateCalc()" class="w-full accent-amber-400">
+          </div>
+        </div>
+
+        <div class="bg-slate-950/90 border border-emerald-500/30 rounded-2xl p-5 flex flex-col justify-between space-y-3">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-400">Estimated Raw BYOK Cost:</span>
+            <span id="calc-total" class="text-2xl font-black text-emerald-400">$0.80</span>
+          </div>
+          <div class="flex justify-between items-center text-xs border-t border-slate-800 pt-2.5">
+            <span class="text-slate-400">Typical SaaS Subscriptions (Runway + Kling + Upscaler):</span>
+            <span class="text-sm font-bold text-rose-400 line-through">$75.00 / month</span>
+          </div>
+          <div class="text-[11px] text-slate-300 bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-2.5">
+            <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i>
+            VirtuFilm AI Studio is a <b>$19 one-time license</b> (Windows &amp; macOS) — zero monthly fees, ever.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Promo Banner -->
+    <section class="glass rounded-2xl p-5 border border-amber-500/40 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="text-sm font-black text-white">Ready for the Full Local Desktop Suite? (Windows 10/11 &amp; macOS Apple Silicon)</div>
+        <div class="text-xs text-slate-300 mt-0.5">Includes Cindy Voice &amp; Text AI Director, Blender 3D Pre-vis, Actor LoRA Studio, Local ComfyUI, and 4K/9:16 Post-Production + 7-Day Money-Back Guarantee.</div>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <a href="https://ehabfiki.gumroad.com/l/ruozct/EARLY100" target="_blank" class="px-5 py-2.5 rounded-xl gold-grad hover:brightness-110 text-slate-950 font-black text-xs shadow-lg">
+          Get 61% OFF on Gumroad ($19) →
+        </a>
+        <a href="https://payhip.com/b/2wWFs" target="_blank" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700">
+          Buy on Payhip
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Upgrade Modal -->
+  <div id="upgrade-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border-2 border-amber-500/60 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black">FULL DESKTOP APP FEATURE</span>
+        <button onclick="closeUpgradeModal()" class="text-slate-400 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <h3 id="upgrade-feature-title" class="text-lg font-black text-white"></h3>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        This feature runs directly on your machine inside <b>VirtuFilm AI Studio</b> (Windows 10/11 &amp; macOS Apple Silicon) with zero monthly subscriptions and a 7-day money-back guarantee.
+      </p>
+      <div class="flex flex-col gap-2 pt-1">
+        <a href="https://ehabfiki.gumroad.com/l/ruozct/EARLY100" target="_blank" class="w-full py-2.5 rounded-xl gold-grad text-center text-slate-950 font-black text-xs shadow-lg">
+          Unlock Full Suite — $19 One-Time (61% OFF)
+        </a>
+        <a href="https://payhip.com/b/2wWFs" target="_blank" class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-slate-200 font-bold text-xs border border-slate-700">
+          Or Buy on Payhip
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const members = [
+      { handle: 'Maya', kind: 'character', desc: '35-year-old woman, shoulder-length dark wavy hair, olive trench coat over black turtleneck, subtle nervous expression' },
+      { handle: 'LondonCafe', kind: 'location', desc: 'quiet London corner cafe with rain-streaked glass windows, warm brass pendant lamps, dark oak tables' }
+    ];
+
+    function esc(s) { return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    function renderMembers() {
+      const el = document.getElementById('demo-members-list');
+      el.innerHTML = members.map((m, i) => `
+        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 flex items-start justify-between gap-2 text-xs">
+          <div>
+            <div class="font-black text-emerald-300 font-mono">@${esc(m.handle)} <span class="text-[10px] text-slate-400 font-sans uppercase ml-1">${esc(m.kind)}</span></div>
+            <div class="text-[11px] text-slate-300 mt-0.5">${esc(m.desc)}</div>
+          </div>
+          <button onclick="members.splice(${i},1);renderMembers();" class="text-rose-400 hover:text-rose-300 px-1.5 cursor-pointer"><i class="fa-solid fa-trash text-[11px]"></i></button>
+        </div>
+      `).join('');
+    }
+
+    function addDemoMember() {
+      const h = (document.getElementById('new-handle').value||'').trim().replace(/^@+/,'').replace(/[^A-Za-z0-9_-]/g,'');
+      const d = (document.getElementById('new-desc').value||'').trim();
+      const k = document.getElementById('new-kind').value;
+      if (!h || !d) return;
+      members.push({ handle: h, kind: k, desc: d });
+      document.getElementById('new-handle').value = '';
+      document.getElementById('new-desc').value = '';
+      renderMembers();
+    }
+
+    function generateDemoOutput() {
+      const raw = (document.getElementById('demo-scene-input').value||'').trim();
+      const look = (document.getElementById('demo-look-line').value||'').trim();
+      const lens = document.getElementById('demo-lens').value;
+      if (!raw) return;
+
+      let expanded = raw;
+      members.forEach(m => {
+        const re = new RegExp('@' + m.handle + '\\b', 'gi');
+        if (re.test(expanded)) {
+          expanded = expanded.replace(re, `[${m.kind.toUpperCase()} LOCK ${m.handle.toUpperCase()}: ${m.desc}]`);
+        }
+      });
+
+      const masterPrompt = `[Subject & Action]: ${expanded} [Temporal Beats]: 0-2s establishing posture and micro-expression; 2-5s subtle natural movement and eye contact; 5-8s smooth camera settle and emotional beat. [Camera & Optics]: ${lens}, deliberate cinematic tracking motion, grounded physics. [Style Lock]: ${look}`;
+
+      const shots = [
+        { n: 1, t: 'Establishing Wide', type: 'Wide Master', p: `Wide establishing shot of ${expanded}. Slow smooth push-in, ${look}` },
+        { n: 2, t: 'Character Entrance & Reaction', type: 'Medium Shot', p: `Medium cinematic shot, ${lens}. ${expanded} Focus on authentic micro-expressions, ${look}` },
+        { n: 3, t: 'Intimate Emotional Beat', type: 'Close-Up', p: `Intimate close-up, 85mm f/1.8 shallow depth of field. Subtle eye contact and natural acting, ${look}` }
+      ];
+
+      document.getElementById('demo-output').innerHTML = `
+        <div class="bg-slate-950/95 border border-amber-500/40 rounded-xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-amber-300"><i class="fa-solid fa-sparkles"></i> Master English Cinema Prompt (Ready for Kling / LTX / Wan)</span>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('out-prompt').value);this.innerText='Copied ✓';" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-[11px] cursor-pointer">Copy Prompt</button>
+          </div>
+          <textarea id="out-prompt" rows="4" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 font-mono text-[11px] text-amber-100 outline-none">${esc(masterPrompt)}</textarea>
+        </div>
+        <div class="space-y-2">
+          <div class="text-xs font-black text-emerald-300"><i class="fa-solid fa-film"></i> Chronological 3-Shot Storyboard Preview</div>
+          ${shots.map(s => `
+            <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-2.5 text-xs">
+              <div class="font-bold text-white"><span class="text-amber-300">Shot ${s.n}:</span> ${s.t} <span class="text-[10px] text-cyan-300 ml-1">[${s.type}]</span></div>
+              <div class="text-[11px] text-slate-400 mt-1 font-mono">${esc(s.p)}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function switchDemoTab(tab) {
+      document.getElementById('tab-studio').classList.toggle('hidden', tab !== 'studio');
+      document.getElementById('tab-calc').classList.toggle('hidden', tab !== 'calc');
+      document.getElementById('tab-btn-studio').className = tab === 'studio'
+        ? 'px-3.5 py-1.5 rounded-xl gold-grad text-slate-950 font-black flex items-center gap-1.5 cursor-pointer'
+        : 'px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-bold flex items-center gap-1.5 cursor-pointer';
+      document.getElementById('tab-btn-calc').className = tab === 'calc'
+        ? 'px-3.5 py-1.5 rounded-xl gold-grad text-slate-950 font-black flex items-center gap-1.5 cursor-pointer'
+        : 'px-3.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-bold flex items-center gap-1.5 cursor-pointer';
+    }
+
+    function updateCalc() {
+      const rate = parseFloat(document.getElementById('calc-model').value || '0');
+      const shots = parseInt(document.getElementById('calc-shots').value || '20', 10);
+      document.getElementById('calc-shots-val').innerText = shots + ' shots';
+      document.getElementById('calc-total').innerText = '$' + (rate * shots).toFixed(2);
+    }
+
+    function openUpgradeModal(title) {
+      document.getElementById('upgrade-feature-title').innerText = title;
+      const m = document.getElementById('upgrade-modal');
+      m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function closeUpgradeModal() {
+      const m = document.getElementById('upgrade-modal');
+      m.classList.add('hidden'); m.classList.remove('flex');
+    }
+
+    // @Mention Autocomplete
+    const inp = document.getElementById('demo-scene-input');
+    const pop = document.getElementById('demo-mention-popup');
+    inp.addEventListener('input', () => {
+      const pos = inp.selectionStart || 0;
+      const before = inp.value.slice(0, pos);
+      const m = before.match(/@([A-Za-z0-9_-]*)$/);
+      if (!m) { pop.classList.add('hidden'); return; }
+      const q = m[1].toLowerCase();
+      const list = members.filter(x => x.handle.toLowerCase().includes(q));
+      if (!list.length) { pop.classList.add('hidden'); return; }
+      pop.innerHTML = list.map(x => `<button type="button" data-h="${esc(x.handle)}" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/20 text-xs text-white flex items-center gap-2 cursor-pointer"><span class="font-mono font-bold text-emerald-300">@${esc(x.handle)}</span><span class="text-[10px] text-slate-400 truncate">${esc(x.desc.slice(0,32))}</span></button>`).join('');
+      pop.querySelectorAll('button').forEach(b => b.addEventListener('mousedown', e => {
+        e.preventDefault();
+        const idx = before.lastIndexOf('@');
+        inp.value = inp.value.slice(0, idx) + '@' + b.dataset.h + ' ' + inp.value.slice(pos);
+        pop.classList.add('hidden'); inp.focus();
+      }));
+      pop.classList.remove('hidden');
+    });
+    inp.addEventListener('blur', () => setTimeout(() => pop.classList.add('hidden'), 150));
+
+    renderMembers();
+    generateDemoOutput();
+    updateCalc();
+  </script>
+</body>
+</html>
